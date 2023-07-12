@@ -2,6 +2,8 @@
 using System.Text;
 namespace program
 {
+
+#nullable disable
     class hangMan
     {
         static void Main(string[] args)
@@ -10,25 +12,27 @@ namespace program
             string[] hangmanErrors = { "|   O", "|   |", "|  /|\\", "|   |", "|  / \\" };
             string[] hangman = { "|   ", "|   ", "|   ", "|   ", "|   ", "|   ", "|   " };
             List<char> guessedLetters = new List<char>();
+            List<char> wordList = word.ToList<char>();
             int errorCounter = 0;
             char[] hiddenWordChars = word.ToCharArray();
             for (int i = 0; i < hiddenWordChars.Length; i++)
             {
-                if(hiddenWordChars[i] == ' ')
+                if (hiddenWordChars[i] == ' ')
                 {
                     hiddenWordChars[i] = ' ';
                 }
                 else
                 {
-                hiddenWordChars[i] = '_';
+                    hiddenWordChars[i] = '_';
                 }
             }
             string hiddenWord = string.Join(" ", hiddenWordChars);
-            string? userGuess = "";
+            string userGuess = "";
             bool onPlay = true;
             Console.WriteLine("Welcome to HangMan game, guess the word below");
             while (onPlay)
             {
+                bool alreadyGuessed = true;
                 Console.WriteLine("======");
                 for (int i = 0; i < hangman.Length; i++)
                 {
@@ -38,17 +42,18 @@ namespace program
                 Console.WriteLine(hiddenWord);
                 Console.Write("Your guess : ");
                 userGuess = Console.ReadLine();
-                while (userGuess == null || userGuess == string.Empty || userGuess.Length > 1)
+                char userGuessChar = emptyStringCheck(userGuess);
+                while (alreadyGuessed)
                 {
-                    Console.WriteLine("please put one letter");
-                    userGuess = Console.ReadLine();
-                }
-                char userGuessChar = Convert.ToChar(userGuess);
-                if(guessedLetters.Contains(userGuessChar))
-                {
-                    Console.Clear();
-                    Console.WriteLine("You already guessed that letter");
-                    continue;
+                    if (guessedLetters.Contains(userGuessChar) && !hiddenWordChars.Contains(userGuessChar))
+                    {
+                        userGuess = Console.ReadLine();
+                        userGuessChar = emptyStringCheck(userGuess);
+                    }
+                    else
+                    {
+                        alreadyGuessed = false;
+                    }
                 }
                 bool letterFound = false;
                 for (int i = 0; i < word.Length; i++)
@@ -61,7 +66,6 @@ namespace program
                         letterFound = true;
                         guessedLetters.Add(userGuessChar);
                     }
-
                 }
                 if (!letterFound)
                 {
@@ -70,14 +74,14 @@ namespace program
                 }
                 Console.Clear();
                 int num = 0;
-                for(int i = 0; i < hiddenWordChars.Length; i ++)
+                for (int i = 0; i < hiddenWordChars.Length; i++)
                 {
-                    if(hiddenWordChars[i] == word[i])
+                    if (hiddenWordChars[i] == word[i])
                     {
                         num++;
                     }
                 }
-                if(num == word.Length || num == hiddenWordChars.Length)
+                if (num == word.Length || num == hiddenWordChars.Length)
                 {
                     Console.WriteLine("You won");
                     onPlay = false;
@@ -95,6 +99,16 @@ namespace program
             }
         }
 
-    }
+        private static char emptyStringCheck(string str)
+        {
+            char c = ' ';
+            while (str == null || str == string.Empty || str.Length != 1)
+            {
+                Console.WriteLine("Please put one letter");
+                str = Console.ReadLine();
+            }
+            return c = str[0];
+        }
 
+    }
 }
